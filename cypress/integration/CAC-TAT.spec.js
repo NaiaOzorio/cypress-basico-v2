@@ -4,12 +4,17 @@ describe('Central de Atendimento ao Cliente TAT', function() {
     beforeEach(() => cy.visit('./src/index.html'))
 
 
-    it('verifica o título da aplicação', function() {
+    Cypress._.times(3, () => {
+        it('verifica o título da aplicação', function() {
         cy.title().should('be.equal', 'Central de Atendimento ao Cliente TAT')
      })
+    })
 
     it('preenche os campos obrigatórios e envia o formulário', function() {
         const longText='Test, test, test, test, test, test, test, test, test'
+
+        cy.clock()
+
         cy.get('#firstName').type('John')
         cy.get('#lastName').type('Winchester')
         cy.get('#email').type('jw@email.com')
@@ -17,6 +22,10 @@ describe('Central de Atendimento ao Cliente TAT', function() {
         cy.get('.button[type="submit"]').click()
 
         cy.get('.success').should('be.visible')
+
+        cy.tick(3000)
+
+        cy.get('.success').should('not.be.visible')
     }) 
 
  
@@ -143,13 +152,32 @@ describe('Central de Atendimento ao Cliente TAT', function() {
          cy.contains('CAC TAT - Política de privacidade').should('be.visible')
     })
 
-    it.only('testa a página da política de privacidade de forma independente', function(){
+    it('testa a página da política de privacidade de forma independente', function(){
         cy.get('a[href="privacy.html"]')
          .invoke('removeAttr', 'target')
          .click()
 
          cy.contains('CAC TAT - Política de privacidade').should('be.visible')
     })
+
+    it.only('exibe e esconde as mensagens de sucesso e erro usando o .invoke', function() {
+        cy.get('.success')
+          .should('not.be.visible')
+          .invoke('show')
+          .should('be.visible')
+          .and('contain', 'Mensagem enviada com sucesso.')
+          .invoke('hide')
+          .should('not.be.visible')
+        cy.get('.error')
+          .should('not.be.visible')
+          .invoke('show')
+          .should('be.visible')
+          .and('contain', 'Valide os campos obrigatórios!')
+          .invoke('hide')
+          .should('not.be.visible')
+      })
+
+
 
 
 
